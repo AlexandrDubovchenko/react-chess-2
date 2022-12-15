@@ -1,5 +1,5 @@
 export class Cell {
-  figuresCanMove = {
+  possibleFiguresMoves = {
     white: {},
     black: {}
   }
@@ -9,12 +9,12 @@ export class Cell {
     this.figure = figure
   }
 
-  addAttack({ figure, canAttack = true }) {
-    this.figuresCanMove[figure.color][figure.id] = canAttack
+  addPossibleFigureMove({ figure, canAttack = true }) {
+    this.possibleFiguresMoves[figure.color][figure.id] = canAttack
   }
 
-  clearAttacks() {
-    this.figuresCanMove = {
+  clearPossibleFiguresMoves() {
+    this.possibleFiguresMoves = {
       white: {},
       black: {}
     }

@@ -86,21 +86,23 @@ export class Board {
   }
 
   #calculateAllPossibleMoves(attackedTeam) {
+    this.board.forEach(row => row.forEach(cell => cell.clearPossibleFiguresMoves()))
     const defenseTeam = attackedTeam === 'white' ? 'black' : 'white'
     let isCheck = false
     const attackedTeamMoves = this.#calculateTeamPossibleMoves(attackedTeam)
     attackedTeamMoves.forEach((move) => {
       if (move.to.figure?.id === this.#kingsId[defenseTeam]) isCheck = true
-      move.to.addAttack({ figure: move.from.figure, canAttack: move.canAttack })
+      move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack })
     })
 
     let defenseTeamMoves = this.#calculateTeamPossibleMoves(defenseTeam)
 
     defenseTeamMoves = defenseTeamMoves.filter(move => {
+      move.to.clearPossibleFiguresMoves
       if (isCheck && !this.canMoveSave(move)) {
         return false
       } else {
-        move.to.addAttack({ figure: move.from.figure, canAttack: move.canAttack })
+        move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack })
         return true
       }
     })
