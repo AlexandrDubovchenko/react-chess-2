@@ -11,25 +11,40 @@ export class Pawn extends Figure {
     this.image = this.images[this.color]
   }
 
-  calculateAttackedCells(board, { x, y }) {
-    const result = []
+  calculateAllPossibleMoves(board, { x, y }) {
+    const moves = []
+    const from = board[y][x]
     const direction = this.color === 'white' ? -1 : 1
-    let cell = board[y + direction][x]
+    let cell = board[y + direction]?.[x]
     if (!cell?.figure) {
-      cell.addAttack(this)
+      moves.push({
+        canAttack: false,
+        to: cell,
+        from
+      })
     }
-    cell = board[y + direction*2][x]
-    if(!this.isTouched && !cell?.figure) {
-      cell.addAttack(this)
+    cell = board[y + direction * 2]?.[x]
+    if (!this.isTouched && !cell?.figure) {
+      moves.push({
+        canAttack: false,
+        to: cell,
+        from
+      })
     }
-    cell = board[y + direction][x - 1]
+    cell = board[y + direction]?.[x - 1]
     if (cell?.figure) {
-      cell.addAttack(this)
+      moves.push({
+        to: cell,
+        from
+      })
     }
-    cell = board[y + direction][x + 1]
+    cell = board[y + direction]?.[x + 1]
     if (cell?.figure) {
-      cell.addAttack(this)
+      moves.push({
+        to: cell,
+        from
+      })
     }
-    return result
+    return moves
   }
 }

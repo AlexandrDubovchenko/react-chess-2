@@ -1,5 +1,5 @@
 export class Cell {
-  attackedBy = {
+  figuresCanMove = {
     white: {},
     black: {}
   }
@@ -9,12 +9,12 @@ export class Cell {
     this.figure = figure
   }
 
-  addAttack(figure) {
-    this.attackedBy[figure.color][figure.id] = figure
+  addAttack({ figure, canAttack = true }) {
+    this.figuresCanMove[figure.color][figure.id] = canAttack
   }
 
   clearAttacks() {
-    this.attackedBy = {
+    this.figuresCanMove = {
       white: {},
       black: {}
     }

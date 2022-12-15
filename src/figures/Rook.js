@@ -10,7 +10,7 @@ export class Rook extends Figure {
     this.image = this.images[this.color]
   }
 
-  calculateAttackedCells() {
-    
+  calculateAllPossibleMoves() {
+    return []
   }
 }
