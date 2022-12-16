@@ -75,7 +75,6 @@ export class Board {
     console.log(to);
     to.figure.position = to.position
     to.figure.isTouched = true
-    console.log(this)
     this.#calculateAllPossibleMoves(to.figure.color)
   }
 
@@ -98,7 +97,6 @@ export class Board {
     let defenseTeamMoves = this.#calculateTeamPossibleMoves(defenseTeam)
 
     defenseTeamMoves = defenseTeamMoves.filter(move => {
-      move.to.clearPossibleFiguresMoves
       if (isCheck && !this.canMoveSave(move)) {
         return false
       } else {
