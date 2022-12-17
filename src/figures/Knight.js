@@ -1,4 +1,4 @@
-import { Figure } from "./Figure";
+import { Figure } from "../common/models/Figure";
 
 export class Knight extends Figure {
   images = {
@@ -10,7 +10,9 @@ export class Knight extends Figure {
     this.image = this.images[this.color]
   }
 
-  calculateAllPossibleMoves(board, { x, y }) {
+  calculateAllPossibleMoves(board) {
+    if (!this.position) return []
+    const { x, y } = this.position
     const from = board[y][x]
     const moves = []
     for (let i = -2; i <= 2; i++) {

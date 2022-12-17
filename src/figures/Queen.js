@@ -1,4 +1,5 @@
-import { Figure } from "./Figure";
+import { Figure } from "../common/models/Figure";
+import { directions, StopOnObstructionMovingStrategy } from "../common/strategies/StopOnObstructionMovingStrategy";
 
 export class Queen extends Figure {
   images = {
@@ -10,7 +11,19 @@ export class Queen extends Figure {
     this.image = this.images[this.color]
   }
 
-  calculateAllPossibleMoves() {
-    return []
+  calculateAllPossibleMoves(board) {
+    if (!this.position) return []
+    return [
+      directions.Left,
+      directions.Forward,
+      directions.Back,
+      directions.Right,
+      directions.LeftBack,
+      directions.LeftForward,
+      directions.RightBack,
+      directions.RightForward
+    ].map((direction) => (
+      StopOnObstructionMovingStrategy.moveUntilObstruction({ board, currentCell: board[this.position.y][this.position.x], direction, distance: board.length - 1 })
+    )).flat()
   }
 }

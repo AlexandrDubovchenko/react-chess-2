@@ -1,4 +1,5 @@
-import { Figure } from "./Figure";
+import { Figure } from "../common/models/Figure";
+import { directions, StopOnObstructionMovingStrategy } from "../common/strategies/StopOnObstructionMovingStrategy";
 
 export class Pawn extends Figure {
   images = {
@@ -11,40 +12,26 @@ export class Pawn extends Figure {
     this.image = this.images[this.color]
   }
 
-  calculateAllPossibleMoves(board, { x, y }) {
-    const moves = []
-    const from = board[y][x]
-    const direction = this.color === 'white' ? -1 : 1
-    let cell = board[y + direction]?.[x]
-    if (!cell?.figure) {
-      moves.push({
-        canAttack: false,
-        to: cell,
-        from
-      })
-    }
-    cell = board[y + direction * 2]?.[x]
-    if (!this.isTouched && !cell?.figure) {
-      moves.push({
-        canAttack: false,
-        to: cell,
-        from
-      })
-    }
-    cell = board[y + direction]?.[x - 1]
-    if (cell?.figure) {
-      moves.push({
-        to: cell,
-        from
-      })
-    }
-    cell = board[y + direction]?.[x + 1]
-    if (cell?.figure) {
-      moves.push({
-        to: cell,
-        from
-      })
-    }
-    return moves
+  calculateAllPossibleMoves(board) {
+    if (!this.position) return []
+    const blackDirections = [directions.LeftForward, directions.RightForward]
+    const whiteDirections = [directions.LeftBack, directions.RightBack]
+    const diagonallyDirections = this.color === 'white' ? whiteDirections : blackDirections
+    return diagonallyDirections.map((direction) => {
+      const moves = StopOnObstructionMovingStrategy.moveUntilObstruction({ board, currentCell: board[this.position.y][this.position.x], direction, distance: 1 })
+      moves.forEach(m => m.attackOnly = true)
+      return moves
+    }).flat().concat(
+      [(this.color === 'white' ? directions.Back : directions.Forward)].map((direction) => {
+        const moves = StopOnObstructionMovingStrategy.moveUntilObstruction({
+          board,
+          currentCell: board[this.position.y][this.position.x],
+          direction,
+          distance: this.isTouched ? 1 : 2
+        })
+        moves.forEach(m => m.canAttack = false)
+        return moves
+      }).flat()
+    )
   }
 }

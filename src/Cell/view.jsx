@@ -1,19 +1,24 @@
 import { useContext } from 'react';
-import { Figure } from '../common/Figure';
+import { Figure } from '../common/views/Figure';
 import { gameContext } from '../provider/gameProvider';
 
-
 export const Cell = ({ cell }) => {
-  const {setSelectedCell, selectedCell, moveFigure} = useContext(gameContext);
-  const isSelected = cell.figure && selectedCell?.figure?.id === cell.figure?.id
-  const isAvailableToMove = selectedCell?.figure && cell.possibleFiguresMoves[selectedCell.figure.color][selectedCell.figure.id] !== undefined
+  const { setSelectedCell, selectedCell, moveFigure } = useContext(gameContext);
+  const isSelected =
+    cell.figure && selectedCell?.figure?.id === cell.figure?.id;
+
+  const isAvailableToMove = selectedCell?.figure && cell.isAvailableToMove(selectedCell?.figure);
   const handleCellClick = () => {
-    if (selectedCell && (!cell.figure || cell.figure?.color !== selectedCell.figure?.color) && isAvailableToMove) {
-      moveFigure(selectedCell, cell)
+    if (
+      selectedCell &&
+      (!cell.figure || cell.figure?.color !== selectedCell.figure?.color) &&
+      isAvailableToMove
+    ) {
+      moveFigure(selectedCell, cell);
     } else {
-      setSelectedCell(cell)
+      setSelectedCell(cell);
     }
-  }
+  };
 
   return (
     <div

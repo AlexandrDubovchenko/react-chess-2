@@ -12,8 +12,10 @@ export class Board {
     black: [],
     white: []
   }
-  #kingsId = {
+  #kings = {
   }
+  isGameOver = false
+  winner = null
 
   constructor() {
     this.#createBoard()
@@ -35,7 +37,9 @@ export class Board {
           figure = this.#getInitialFigure(i, j)
         }
         if (figure) {
-          this.#teams[figureColor].push(figure)
+          if (figure.id !== this.#kings[figure.color]?.id) {
+            this.#teams[figureColor].push(figure)
+          }
           figure.position = position
         }
         this.board[i][j] = new Cell(position, cellColor, figure)
@@ -60,27 +64,28 @@ export class Board {
       case 3:
         return new Queen(id, figureColor)
       case 4:
-        this.#kingsId[figureColor] = id
-        return new King(id, figureColor)
+        const figure = new King(id, figureColor)
+        this.#kings[figureColor] = figure
+        return figure
     }
   }
 
   moveFigure(from, to) {
+    const movingFigure = from.figure
     if (to.figure) {
       to.figure.position = null
       this.#teams[to.figure.color] = this.#teams[to.figure.color].filter((f) => f.id !== to.figure.id)
     }
-    to.figure = from.figure
+    to.figure = movingFigure
     from.figure = null
-    console.log(to);
-    to.figure.position = to.position
-    to.figure.isTouched = true
-    this.#calculateAllPossibleMoves(to.figure.color)
+    movingFigure.position = to.position
+    movingFigure.isTouched = true
+    this.#calculateAllPossibleMoves(movingFigure.color)
   }
 
   #calculateTeamPossibleMoves(team) {
     return this.#teams[team].map((figure) => {
-      return figure.calculateAllPossibleMoves(this.board, figure.position)
+      return figure.calculateAllPossibleMoves(this.board)
     }).flat()
   }
 
@@ -90,8 +95,8 @@ export class Board {
     let isCheck = false
     const attackedTeamMoves = this.#calculateTeamPossibleMoves(attackedTeam)
     attackedTeamMoves.forEach((move) => {
-      if (move.to.figure?.id === this.#kingsId[defenseTeam]) isCheck = true
-      move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack })
+      if (move.to.figure?.id === this.#kings[defenseTeam].id) isCheck = true
+      move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack, attackOnly: move.attackOnly })
     })
 
     let defenseTeamMoves = this.#calculateTeamPossibleMoves(defenseTeam)
@@ -100,11 +105,26 @@ export class Board {
       if (isCheck && !this.canMoveSave(move)) {
         return false
       } else {
-        move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack })
+        move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack, attackOnly: move.attackOnly })
         return true
       }
     })
 
+    this.#kings[attackedTeam].calculateAllPossibleMoves(this.board).forEach((move) => {
+      move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack })
+    })
+    let defenseKingMoves = this.#kings[defenseTeam].calculateAllPossibleMoves(this.board).filter(move => {
+      if (isCheck && !this.canMoveSave(move)) {
+        return false
+      } else {
+        if (isCheck) {
+          console.log(move);
+        }
+        move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack, attackOnly: move.attackOnly })
+        return true
+      }
+    })
+    defenseTeamMoves.push(...defenseKingMoves)
     if (!defenseTeamMoves.length) {
       this.isGameOver = true
       this.winner = attackedTeam
@@ -112,18 +132,30 @@ export class Board {
   }
 
   canMoveSave(move) {
-    const figure = move.from.figure
-    const attackedTeam = figure.color === 'white' ? 'black' : 'white'
-    const toFigure = move.to.figure
-    move.to.figure = move.figure
-    move.from.figure = null
+    const fromCell = move.from
+    const toCell = move.to
+    const fromFigure = fromCell.figure
+    const toFigure = toCell.figure
+    const attackedTeam = fromCell.figure.color === 'white' ? 'black' : 'white'
+    toCell.figure = fromFigure
+    fromFigure.position = toCell.position
+    fromCell.figure = null
+    if (toFigure) {
+      toFigure.position = null
+    }
 
     const moves = this.#calculateTeamPossibleMoves(attackedTeam)
+
     const isKingAttacked = !!moves.find((m) => {
-      return m.to.figure?.id === this.#kingsId[figure.color]
+      return m.to.figure?.id === this.#kings[fromFigure.color].id
     })
-    move.from.figure = figure
-    move.to.figure = toFigure
+
+    fromCell.figure = fromFigure
+    toCell.figure = toFigure
+    fromFigure.position = fromCell.position
+    if (toFigure) {
+      toFigure.position = toCell.position
+    }
     return !isKingAttacked
   }
 }

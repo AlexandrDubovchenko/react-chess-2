@@ -1,4 +1,5 @@
-import { Figure } from "./Figure";
+import { Figure } from "../common/models/Figure";
+import { StopOnObstructionMovingStrategy, directions } from '../common/strategies/StopOnObstructionMovingStrategy'
 
 export class Bishop extends Figure {
   images = {
@@ -11,42 +12,9 @@ export class Bishop extends Figure {
   }
 
   calculateAllPossibleMoves(board) {
-    const from = board[this.position.y][this.position.x]
-    const moves = []
-    const diagonals = {}
-    const checkCell = (cell, diagonal) => {
-      if (diagonals[diagonal]) return
-      if (!cell) return
-      if (!cell.figure) {
-        moves.push({
-          to: cell,
-          from
-        })
-      } else if (cell.figure.color !== this.color) {
-        moves.push({
-          to: cell,
-          from
-        })
-        diagonals[diagonal] = true
-      } else {
-        diagonals[diagonal] = true
-      }
-    }
-
-    for (let i = 1; i < 8; i++) {
-
-      const cells = [
-        board[this.position.y - i]?.[this.position.x - i],
-        board[this.position.y + i]?.[this.position.x - i],
-        board[this.position.y + i]?.[this.position.x + i],
-        board[this.position.y - i]?.[this.position.x + i],
-      ]
-
-      cells.forEach(checkCell)
-    }
-    if (this.color === 'white') {
-      console.log(moves);
-    }
-    return moves
+    if (!this.position) return []
+    return [directions.LeftBack, directions.LeftForward, directions.RightBack, directions.RightForward].map((direction) => (
+      StopOnObstructionMovingStrategy.moveUntilObstruction({ board, currentCell: board[this.position.y][this.position.x], direction, distance: board.length - 1 })
+    )).flat()
   }
 }
