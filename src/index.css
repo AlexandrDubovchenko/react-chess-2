@@ -4,8 +4,19 @@
   padding-top: 100px;
 }
 
+.app-finished {
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.board_container {
+  display: flex;
+  gap: 20px;
+}
+
 .board {
-  background: #BA8E4A;
+  background: #ba8e4a;
 }
 
 .row {
@@ -26,11 +37,11 @@
 }
 
 .cell-white {
-  background: #BA8E4A;
+  background: #ba8e4a;
 }
 
 .cell-selected {
-  background: #EEE8AA
+  background: #eee8aa;
 }
 
 .availableDot {
@@ -42,4 +53,31 @@
   height: 10px;
   border-radius: 100%;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.timers_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.timer {
+  border-radius: 4px;
+  background: grey;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: black;
+  font-weight: bold;
+}
+
+.timer-active {
+  background: darkorange;
+  color: white;
+}
+
+.winner_notification {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: "Times New Roman", Times, serif;
+  color: crimson;
 }
