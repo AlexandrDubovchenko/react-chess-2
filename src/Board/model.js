@@ -117,9 +117,6 @@ export class Board {
       if (isCheck && !this.canMoveSave(move)) {
         return false
       } else {
-        if (isCheck) {
-          console.log(move);
-        }
         move.to.addPossibleFigureMove({ figure: move.from.figure, canAttack: move.canAttack, attackOnly: move.attackOnly })
         return true
       }

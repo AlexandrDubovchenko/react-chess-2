@@ -7,12 +7,14 @@ import { GameProvider } from './provider/gameProvider';
 const boardInstance = new Board();
 function App() {
   const [selectedCell, setSelectedCell] = useState(null);
+  const [attackTeam, setAttackTeam] = useState('white')
   const [board, setBoard] = useState(boardInstance.board);
   const update = () => {
     setBoard([...boardInstance.board]);
   };
 
   useEffect(() => {
+    setAttackTeam(prev => prev === 'white' ? 'black': 'white')
     if (boardInstance.isGameOver) alert('Winner is', boardInstance.winner);
   }, [board]);
 
@@ -25,6 +27,7 @@ function App() {
           boardInstance.moveFigure(...args);
           update();
         },
+        attackTeam
       }}
     >
       <div className='App'>

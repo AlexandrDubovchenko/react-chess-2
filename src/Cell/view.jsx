@@ -3,7 +3,7 @@ import { Figure } from '../common/views/Figure';
 import { gameContext } from '../provider/gameProvider';
 
 export const Cell = ({ cell }) => {
-  const { setSelectedCell, selectedCell, moveFigure } = useContext(gameContext);
+  const { setSelectedCell, selectedCell, moveFigure, attackTeam } = useContext(gameContext);
   const isSelected =
     cell.figure && selectedCell?.figure?.id === cell.figure?.id;
 
@@ -15,8 +15,10 @@ export const Cell = ({ cell }) => {
       isAvailableToMove
     ) {
       moveFigure(selectedCell, cell);
-    } else {
+    } else if(cell.figure?.color === attackTeam){
       setSelectedCell(cell);
+    } else {
+      setSelectedCell(null)
     }
   };
 
